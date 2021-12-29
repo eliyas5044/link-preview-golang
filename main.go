@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/gocolly/colly"
-	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 )
 
@@ -99,10 +98,11 @@ func GetPort() string {
 
 func main() {
 	// example usage: curl -s 'http://127.0.0.1:8080/?url=http://go-colly.org/'
-	router := mux.NewRouter()
-	router.HandleFunc("/", getInfo)
 
-	handler := cors.Default().Handler(router)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", getInfo)
+
+	handler := cors.Default().Handler(mux)
 
 	log.Println("INFO: Listening on port", GetPort())
 	log.Fatal(http.ListenAndServe(GetPort(), handler))
