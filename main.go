@@ -21,9 +21,9 @@ type Info struct {
 }
 
 func enableCors(w *http.ResponseWriter) {
-	(*w).Header().Set("Access-Control-Allow-Origin", "*")
-	(*w).Header().Set("Access-Control-Request-Method", "*")
-	(*w).Header().Set("Access-Control-Request-Headers", "*")
+	(*w).Header().Add("Access-Control-Allow-Origin", "*")
+	(*w).Header().Add("Access-Control-Request-Method", "*")
+	(*w).Header().Add("Access-Control-Request-Headers", "*")
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
