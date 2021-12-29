@@ -2,14 +2,13 @@ package main
 
 import (
 	"encoding/json"
-
 	"fmt"
-
+	"net/http"
 	"os"
 
-	"net/http"
-
 	"github.com/gocolly/colly"
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 )
 
 type Info struct {
@@ -99,9 +98,13 @@ func GetPort() string {
 
 func main() {
 	// example usage: curl -s 'http://127.0.0.1:8080/?url=http://go-colly.org/'
+	router := mux.NewRouter()
+	router.HandleFunc("/", handler).Methods("GET")
 
-	http.HandleFunc("/", handler)
+	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With"})
+	originsOk := handlers.AllowedOrigins([]string{GetOrigins()})
+	methodsOk := handlers.AllowedMethods([]string{"GET", "POST"})
 
 	fmt.Println("INFO: Listening on port", GetPort())
-	http.ListenAndServe(GetPort(), nil)
+	http.ListenAndServe(GetPort(), handlers.CORS(originsOk, headersOk, methodsOk)(router))
 }
