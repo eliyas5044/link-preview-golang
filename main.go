@@ -2,12 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 	"os"
 
 	"github.com/gocolly/colly"
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -21,9 +20,9 @@ type Info struct {
 }
 
 func enableCors(w *http.ResponseWriter) {
-	(*w).Header().Add("Access-Control-Allow-Origin", "*")
-	(*w).Header().Add("Access-Control-Request-Method", "*")
-	(*w).Header().Add("Access-Control-Request-Headers", "*")
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Request-Method", "*")
+	(*w).Header().Set("Access-Control-Request-Headers", "*")
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -31,10 +30,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	URL := r.URL.Query().Get("url")
 	if URL == "" {
-		fmt.Println("ERROR: Missing URL argument")
+		log.Println("ERROR: Missing URL argument")
 		return
 	}
-	fmt.Println("INFO: Visiting", URL)
+	log.Println("INFO: Visiting", URL)
 
 	c := colly.NewCollector()
 
@@ -67,11 +66,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	// extract status code
 	c.OnResponse(func(r *colly.Response) {
-		fmt.Println("INFO: Response received", r.StatusCode)
+		log.Println("INFO: Response received", r.StatusCode)
 		data.StatusCode = r.StatusCode
 	})
 	c.OnError(func(r *colly.Response, err error) {
-		fmt.Println("ERROR:", r.StatusCode, err)
+		log.Println("ERROR:", r.StatusCode, err)
 		data.StatusCode = r.StatusCode
 	})
 
@@ -80,7 +79,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	// dump results
 	b, err := json.Marshal(data)
 	if err != nil {
-		fmt.Println("ERROR: Failed to serialize response:", err)
+		log.Println("ERROR: Failed to serialize response:", err)
 		return
 	}
 
@@ -92,7 +91,7 @@ func GetOrigins() string {
 	var origin = os.Getenv("ORIGIN_ALLOWED")
 	if origin == "" {
 		origin = "*"
-		fmt.Println("INFO: No ORIGIN_ALLOWED environment variable detected, defaulting to " + origin)
+		log.Println("INFO: No ORIGIN_ALLOWED environment variable detected, defaulting to " + origin)
 	}
 	return origin
 }
@@ -100,7 +99,7 @@ func GetPort() string {
 	var port = os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
-		fmt.Println("INFO: No PORT environment variable detected, defaulting to " + port)
+		log.Println("INFO: No PORT environment variable detected, defaulting to " + port)
 	}
 	return ":" + port
 }
@@ -110,6 +109,6 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/", handler).Methods("GET", "OPTIONS")
 
-	fmt.Println("INFO: Listening on port", GetPort())
-	http.ListenAndServe(GetPort(), handlers.CORS()(router))
+	log.Println("INFO: Listening on port", GetPort())
+	log.Fatal(http.ListenAndServe(GetPort(), router))
 }
