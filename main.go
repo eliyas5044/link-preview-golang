@@ -20,7 +20,15 @@ type Info struct {
 	Link        string
 }
 
+// func enableCors(w *http.ResponseWriter) {
+// 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+// 	(*w).Header().Set("Access-Control-Request-Method", "*")
+// 	(*w).Header().Set("Access-Control-Request-Headers", "*")
+// }
+
 func handler(w http.ResponseWriter, r *http.Request) {
+	// enableCors(&w)
+
 	URL := r.URL.Query().Get("url")
 	if URL == "" {
 		fmt.Println("ERROR: Missing URL argument")
@@ -75,8 +83,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("ERROR: Failed to serialize response:", err)
 		return
 	}
-	w.Header().Set("Access-Control-Allow-Origin", GetOrigins())
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
 	w.Header().Add("Content-Type", "application/json")
 	w.Write(b)
 }
@@ -101,12 +108,8 @@ func GetPort() string {
 func main() {
 	// example usage: curl -s 'http://127.0.0.1:8080/?url=http://go-colly.org/'
 	router := mux.NewRouter()
-	router.HandleFunc("/", handler).Methods("GET", "OPTIONS")
-
-	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With"})
-	originsOk := handlers.AllowedOrigins([]string{GetOrigins()})
-	methodsOk := handlers.AllowedMethods([]string{"GET", "OPTIONS"})
+	router.HandleFunc("/", handler)
 
 	fmt.Println("INFO: Listening on port", GetPort())
-	http.ListenAndServe(GetPort(), handlers.CORS(originsOk, headersOk, methodsOk)(router))
+	http.ListenAndServe(GetPort(), handlers.CORS()(router))
 }
