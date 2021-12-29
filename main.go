@@ -102,7 +102,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", getInfo)
 
-	handler := cors.Default().Handler(mux)
+	handler := cors.AllowAll().Handler(mux)
 
 	log.Println("INFO: Listening on port", GetPort())
 	log.Fatal(http.ListenAndServe(GetPort(), handler))
