@@ -20,14 +20,14 @@ type Info struct {
 	Link        string
 }
 
-// func enableCors(w *http.ResponseWriter) {
-// 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
-// 	(*w).Header().Set("Access-Control-Request-Method", "*")
-// 	(*w).Header().Set("Access-Control-Request-Headers", "*")
-// }
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Request-Method", "*")
+	(*w).Header().Set("Access-Control-Request-Headers", "*")
+}
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	// enableCors(&w)
+	enableCors(&w)
 
 	URL := r.URL.Query().Get("url")
 	if URL == "" {
