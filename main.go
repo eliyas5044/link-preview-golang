@@ -8,6 +8,7 @@ import (
 
 	"github.com/gocolly/colly"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 type Info struct {
@@ -19,15 +20,7 @@ type Info struct {
 	Link        string
 }
 
-func enableCors(w *http.ResponseWriter) {
-	(*w).Header().Set("Access-Control-Allow-Origin", "*")
-	(*w).Header().Set("Access-Control-Request-Method", "*")
-	(*w).Header().Set("Access-Control-Request-Headers", "*")
-}
-
-func handler(w http.ResponseWriter, r *http.Request) {
-	enableCors(&w)
-
+func getInfo(w http.ResponseWriter, r *http.Request) {
 	URL := r.URL.Query().Get("url")
 	if URL == "" {
 		log.Println("ERROR: Missing URL argument")
@@ -107,8 +100,10 @@ func GetPort() string {
 func main() {
 	// example usage: curl -s 'http://127.0.0.1:8080/?url=http://go-colly.org/'
 	router := mux.NewRouter()
-	router.HandleFunc("/", handler).Methods("GET", "OPTIONS")
+	router.HandleFunc("/", getInfo)
+
+	handler := cors.Default().Handler(router)
 
 	log.Println("INFO: Listening on port", GetPort())
-	log.Fatal(http.ListenAndServe(GetPort(), router))
+	log.Fatal(http.ListenAndServe(GetPort(), handler))
 }

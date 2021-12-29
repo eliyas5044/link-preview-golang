@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/gocolly/colly v1.2.0
 	github.com/gorilla/mux v1.8.0
+	github.com/rs/cors v1.8.2
 )
 
 require (
