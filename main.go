@@ -108,7 +108,7 @@ func GetPort() string {
 func main() {
 	// example usage: curl -s 'http://127.0.0.1:8080/?url=http://go-colly.org/'
 	router := mux.NewRouter()
-	router.HandleFunc("/", handler)
+	router.HandleFunc("/", handler).Methods("GET", "OPTIONS")
 
 	fmt.Println("INFO: Listening on port", GetPort())
 	http.ListenAndServe(GetPort(), handlers.CORS()(router))
